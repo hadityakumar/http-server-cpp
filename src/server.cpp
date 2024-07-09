@@ -51,6 +51,11 @@ void handleClient(int client, std::string dir)
     map[key] = value;
   }
 
+  if(map.find("Content-Encoding")==map.end())
+  {
+    map["Content-Encoding"]="";
+  }
+
   // Body parsing
 
   std::getline(stream, line);
@@ -80,7 +85,7 @@ void handleClient(int client, std::string dir)
     {
       size_t slashPos = path.find_last_of('/');
       std::string fileName = path.substr(slashPos + 1);
-      std::string response = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: " + std::to_string(fileName.size()) + "\r\n\r\n" + fileName;
+      std::string response = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Encoding: "+ map["Content-Encoding"]+"Content-Length: " + std::to_string(fileName.size()) + "\r\n\r\n" + fileName;
       send(client, response.c_str(), response.size(), 0);
     }
     else if (path.size() >= 11 && path.substr(0, 11) == "/user-agent")
