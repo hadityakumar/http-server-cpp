@@ -50,7 +50,11 @@ void handleClient(int client, std::string dir)
     map[key] = value;
   }
 
-  std::cout<<path<<"\n";
+  //Body parsing
+
+  std::string body = std::stream.str();
+
+
 
   if (path == "/")
   {
