@@ -69,7 +69,7 @@ int main(int argc, char **argv)
 std::istringstream stream(request);
 std::string line;
 
-std::getline(stream, line)
+std::getline(stream, line);
 std::istringstream requestLine(line);
 std::string method, path, httpVersion;
 requestLine >> method >> path >> httpVersion;
