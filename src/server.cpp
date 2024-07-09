@@ -66,14 +66,14 @@ int main(int argc, char **argv)
 
 
 
-std::istringstream ss(request);
+std::istringstream stream(request);
 std::string line;
 
-std::getline(ss, line)
+std::getline(stream, line)
 std::istringstream requestLine(line);
 std::string method, path, httpVersion;
 requestLine >> method >> path >> httpVersion;
-std::cout<<method<<endl<<path<<endl<<httpVersion<<endl;
+std::cout<<method<<std::endl<<path<<std::endl<<httpVersion<<std::endl;
 
 
 
