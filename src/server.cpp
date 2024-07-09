@@ -8,6 +8,7 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <sstream>
+#include <bits/stdc++.h>
 int main(int argc, char **argv)
 {
   // Flush after every std::cout / std::cerr
