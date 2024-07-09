@@ -15,14 +15,20 @@
 #include <fstream>
 #include <map>
 
-void handleClient(int client, const std::string dir)
+void handleClient(int client, std::string dir)
 {
   std::string STATUS_OK = "HTTP/1.1 200 OK\r\n\r\n";
   std::string NOT_FOUND = "HTTP/1.1 404 Not Found\r\n\r\n";
 
   char buffer[1024];
-  recv(client, buffer, 1024, 0);
-  std::string request(buffer);
+  int bytes_recvd = recv(client, buffer, sizeof(buffer), 0);
+  if(bytes_recvd < 0){
+    std::cerr << "Failed to read from client\n";
+    close(client);
+    return;
+  }
+
+  std::string request(buffer, bytes_recvd);
 
   std::istringstream stream(request);
   std::string line;
@@ -43,6 +49,8 @@ void handleClient(int client, const std::string dir)
       value.pop_back();
     map[key] = value;
   }
+
+  std::cout<<path<<"\n";
 
   if (path == "/")
   {
