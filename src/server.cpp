@@ -59,12 +59,6 @@ int main(int argc, char **argv) {
 
   char buffer[1024];;
   ssize_t bytes_recvd = recv(client, buffer, 1024, 0);
-  if(bytes_recvd < 0) {
-    std::cerr << "recv failed\n";
-    close(client);
-    close(server_fd);
-    return 1;
-  }
 
   std::string request(buffer);
   if(request.substr(0, 10) == "GET / HTTP")
