@@ -60,11 +60,11 @@ int main(int argc, char **argv)
 
   std::string STATUS_OK = "HTTP/1.1 200 OK\r\n\r\n";
   std::string NOT_FOUND = "HTTP/1.1 404 Not Found\r\n\r\n";
-  char buffer[1024];
+  char buffer[1024];;
 
   recv(client, buffer, 1024, 0);
   std::string request(buffer);
-  
+
   if (request.substr(0, 10) == "GET / HTTP")
     send(client, STATUS_OK.c_str(), STATUS_OK.size(), 0);
   else
