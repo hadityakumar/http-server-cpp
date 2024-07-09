@@ -65,7 +65,6 @@ void handleClient(int client, std::string dir)
     if(encoding[0] == ' ')
       encoding.erase(0, 1);
     encoderSet.insert(encoding);
-    std::cout<<encoding<<std::endl;
   }
   
 
