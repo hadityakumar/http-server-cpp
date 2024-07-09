@@ -13,7 +13,7 @@
 #include <fstream>
 #include <map>
 
-void handleClient(int client, std::string &dir)
+void handleClient(int client, const std::string dir)
 {
   std::string STATUS_OK = "HTTP/1.1 200 OK\r\n\r\n";
   std::string NOT_FOUND = "HTTP/1.1 404 Not Found\r\n\r\n";
@@ -60,7 +60,7 @@ void handleClient(int client, std::string &dir)
   }
 
   else if(path.size() >= 6 && path == "/files"){
-    std::string fileName = path.substr(8);
+    std::string fileName = path.substr(7);
     std::cout<<dir<<fileName<<"\n";
     std::ifstream file(dir + fileName);
 
@@ -133,7 +133,6 @@ int main(int argc, char **argv)
   int client_addr_len = sizeof(client_addr);
 
   std::cout << "Waiting for a client to connect...\n";
-
 
 
   while (true)
