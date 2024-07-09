@@ -16,6 +16,7 @@
 #include <map>
 #include <set>
 #include <gzip/compress.hpp>
+#include <bits/stdc++.h>
 
 void handleClient(int client, std::string dir)
 {
