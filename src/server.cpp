@@ -11,67 +11,65 @@
 #include <bits/stdc++.h>
 #include <thread>
 
-
-void handleClient(int client){
+void handleClient(int client)
+{
   std::string STATUS_OK = "HTTP/1.1 200 OK\r\n\r\n";
-    std::string NOT_FOUND = "HTTP/1.1 404 Not Found\r\n\r\n";
+  std::string NOT_FOUND = "HTTP/1.1 404 Not Found\r\n\r\n";
 
-    char buffer[1024];
-    recv(client, buffer, 1024, 0);
-    std::string request(buffer);
+  char buffer[1024];
+  recv(client, buffer, 1024, 0);
+  std::string request(buffer);
 
-    std::istringstream stream(request);
-    std::string line;
+  std::istringstream stream(request);
+  std::string line;
 
-    std::getline(stream, line);
-    std::istringstream requestLine(line);
-    std::string method, path, httpVersion;
-    requestLine >> method >> path >> httpVersion;
+  std::getline(stream, line);
+  std::istringstream requestLine(line);
+  std::string method, path, httpVersion;
+  requestLine >> method >> path >> httpVersion;
 
-    std::map<std::string, std::string> map;
-    while (std::getline(stream, line) && line != "\r")
-    {
-      std::string key = line.substr(0, line.find(":"));
-      std::string value = line.substr(line.find(":") + 2);
-      if (!value.empty() && value[0] == ' ')
-        value.erase(0, 1);
-      if (!value.empty() && value.back() == '\r')
-        value.pop_back();
-      map[key] = value;
-    }
+  std::map<std::string, std::string> map;
+  while (std::getline(stream, line) && line != "\r")
+  {
+    std::string key = line.substr(0, line.find(":"));
+    std::string value = line.substr(line.find(":") + 2);
+    if (!value.empty() && value[0] == ' ')
+      value.erase(0, 1);
+    if (!value.empty() && value.back() == '\r')
+      value.pop_back();
+    map[key] = value;
+  }
 
-    if (path == "/")
-    {
-      send(client, STATUS_OK.c_str(), STATUS_OK.size(), 0);
-    }
-    else if (path.size() >= 5 && path.substr(0, 5) == "/echo")
-    {
-      size_t slashPos = path.find_last_of('/');
-      std::string fileName = path.substr(slashPos + 1);
-      std::string response = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: " + std::to_string(fileName.size()) + "\r\n\r\n" + fileName;
-      send(client, response.c_str(), response.size(), 0);
-    }
-    else if (path.size() >= 11 && path.substr(0, 11) == "/user-agent")
-    {
-      std::string response = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: " + std::to_string(map["User-Agent"].size()) + "\r\n\r\n" + map["User-Agent"];
-      send(client, response.c_str(), response.size(), 0);
-    }
+  if (path == "/")
+  {
+    send(client, STATUS_OK.c_str(), STATUS_OK.size(), 0);
+  }
+  else if (path.size() >= 5 && path.substr(0, 5) == "/echo")
+  {
+    size_t slashPos = path.find_last_of('/');
+    std::string fileName = path.substr(slashPos + 1);
+    std::string response = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: " + std::to_string(fileName.size()) + "\r\n\r\n" + fileName;
+    send(client, response.c_str(), response.size(), 0);
+  }
+  else if (path.size() >= 11 && path.substr(0, 11) == "/user-agent")
+  {
+    std::string response = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: " + std::to_string(map["User-Agent"].size()) + "\r\n\r\n" + map["User-Agent"];
+    send(client, response.c_str(), response.size(), 0);
+  }
 
-    else
-    {
-      send(client, NOT_FOUND.c_str(), NOT_FOUND.size(), 0);
-    }
-    close(client);
-    return;
+  else
+  {
+    send(client, NOT_FOUND.c_str(), NOT_FOUND.size(), 0);
+  }
+  close(client);
+  return;
 }
 
 int main(int argc, char **argv)
 {
-  // Flush after every std::cout / std::cerr
   std::cout << std::unitbuf;
   std::cerr << std::unitbuf;
 
-  // You can use print statements as follows for debugging, they'll be visible when running tests.
   std::cout << "Logs from your program will appear here!\n";
 
   int server_fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -80,9 +78,7 @@ int main(int argc, char **argv)
     std::cerr << "Failed to create server socket\n";
     return 1;
   }
-  //
-  // // Since the tester restarts your program quite often, setting SO_REUSEADDR
-  // // ensures that we don't run into 'Address already in use' errors
+  // so we don't run into 'Address already in use' errors
   int reuse = 1;
   if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse)) < 0)
   {
@@ -113,11 +109,14 @@ int main(int argc, char **argv)
 
   std::cout << "Waiting for a client to connect...\n";
 
+  
+
   while (true)
   {
     int client = accept(server_fd, (struct sockaddr *)&client_addr, (socklen_t *)&client_addr_len);
-    if(client <0){
-      std::cerr<<"Failed to accept client";
+    if (client < 0)
+    {
+      std::cerr << "Failed to accept client";
       continue;
     }
     std::cout << "Client connected\n";
