@@ -76,7 +76,6 @@ void handleClient(int client, std::string dir)
 
   else if(path.size() >= 6 && path.substr(0,7) == "/files/"){
     std::string fileName = path.substr(7);
-    std::cout<<dir<<fileName<<"\n";
     std::ifstream file(dir + fileName);
 
     if(file.good() && file.is_open()){
