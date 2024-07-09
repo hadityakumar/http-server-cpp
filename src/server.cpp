@@ -22,7 +22,8 @@ void handleClient(int client, std::string dir)
 
   char buffer[1024];
   int bytes_recvd = recv(client, buffer, sizeof(buffer), 0);
-  if(bytes_recvd < 0){
+  if (bytes_recvd < 0)
+  {
     std::cerr << "Failed to read from client\n";
     close(client);
     return;
@@ -50,60 +51,76 @@ void handleClient(int client, std::string dir)
     map[key] = value;
   }
 
-  //Body parsing
+  // Body parsing
 
   std::getline(stream, line);
-  std::cout<<line<<"\n";
+  std::string body = line;
 
+  // POST
 
-
-  if (path == "/")
+  if (method == "POST")
   {
-    send(client, STATUS_OK.c_str(), STATUS_OK.size(), 0);
-  }
-  else if (path.size() >= 5 && path.substr(0, 5) == "/echo")
-  {
-    size_t slashPos = path.find_last_of('/');
-    std::string fileName = path.substr(slashPos + 1);
-    std::string response = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: " + std::to_string(fileName.size()) + "\r\n\r\n" + fileName;
-    send(client, response.c_str(), response.size(), 0);
-  }
-  else if (path.size() >= 11 && path.substr(0, 11) == "/user-agent")
-  {
-    std::string response = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: " + std::to_string(map["User-Agent"].size()) + "\r\n\r\n" + map["User-Agent"];
-    send(client, response.c_str(), response.size(), 0);
-  }
-
-  else if(path.size() >= 6 && path.substr(0,7) == "/files/"){
+    int len = std::stoi(map["Content-Length"]);
     std::string fileName = path.substr(7);
-    std::ifstream file(dir + fileName);
+    std::ofstream file(dir + fileName);
+    file << body;
+    file.close();
+    std::string response = "HTTP/1.1 201 Created\r\n\r\n";
+    send(client, response.c_str(), response.size(), 0);
+  }
 
-    if(file.good() && file.is_open()){
-      std::stringstream buffer;
-      buffer << file.rdbuf();
-      std::string response = "HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: "+ std::to_string(buffer.str().size()) + "\r\n\r\n" + buffer.str();
+  else if (method == "GET")
+  {
+
+    if (path == "/")
+    {
+      send(client, STATUS_OK.c_str(), STATUS_OK.size(), 0);
+    }
+    else if (path.size() >= 5 && path.substr(0, 5) == "/echo")
+    {
+      size_t slashPos = path.find_last_of('/');
+      std::string fileName = path.substr(slashPos + 1);
+      std::string response = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: " + std::to_string(fileName.size()) + "\r\n\r\n" + fileName;
       send(client, response.c_str(), response.size(), 0);
     }
-    else{
+    else if (path.size() >= 11 && path.substr(0, 11) == "/user-agent")
+    {
+      std::string response = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: " + std::to_string(map["User-Agent"].size()) + "\r\n\r\n" + map["User-Agent"];
+      send(client, response.c_str(), response.size(), 0);
+    }
+
+    else if (path.size() >= 6 && path.substr(0, 7) == "/files/")
+    {
+      std::string fileName = path.substr(7);
+      std::ifstream file(dir + fileName);
+
+      if (file.good() && file.is_open())
+      {
+        std::stringstream buffer;
+        buffer << file.rdbuf();
+        std::string response = "HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: " + std::to_string(buffer.str().size()) + "\r\n\r\n" + buffer.str();
+        send(client, response.c_str(), response.size(), 0);
+      }
+      else
+      {
+        send(client, NOT_FOUND.c_str(), NOT_FOUND.size(), 0);
+      }
+    }
+
+    else
+    {
       send(client, NOT_FOUND.c_str(), NOT_FOUND.size(), 0);
     }
-  }
-
-  else
-  {
-    send(client, NOT_FOUND.c_str(), NOT_FOUND.size(), 0);
   }
   close(client);
   return;
 }
 
-
-
 int main(int argc, char **argv)
 {
   std::string dir;
 
-  if(argc == 3 && strcmp(argv[1], "--directory")==0)
+  if (argc == 3 && strcmp(argv[1], "--directory") == 0)
     dir = argv[2];
 
   std::cout << std::unitbuf;
@@ -147,7 +164,6 @@ int main(int argc, char **argv)
   int client_addr_len = sizeof(client_addr);
 
   std::cout << "Waiting for a client to connect...\n";
-
 
   while (true)
   {
