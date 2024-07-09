@@ -8,8 +8,9 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <sstream>
-#include <bits/stdc++.h>
 #include <thread>
+#include <sstream>
+#include <fstream>
 
 void handleClient(int client)
 {
@@ -57,6 +58,21 @@ void handleClient(int client)
     send(client, response.c_str(), response.size(), 0);
   }
 
+  else if(path.size() >= 6 && path == "/files"){
+    std::string fileName = path.substr(8);
+    std::cout<<dir<<fileName<<"\n";
+    std::ifstream file(dir + fileName);
+
+    if(file.good()){
+      std::stringstream buffer = file.rdbuf();
+      std::response = "HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: "+ buffer.str().size() + "\r\n\r\n" + buffer.str();
+      send(client, response.c_str(), response.size(), 0);
+    }
+    else{
+      send(client, NOT_FOUND.c_str(), NOT_FOUND.size(), 0);
+    }
+  }
+
   else
   {
     send(client, NOT_FOUND.c_str(), NOT_FOUND.size(), 0);
@@ -65,8 +81,15 @@ void handleClient(int client)
   return;
 }
 
+
+
 int main(int argc, char **argv)
 {
+  std::string dir;
+
+  if(argc == 3 && strcmp(argv[1], "--directory")==0)
+    dir = argv[2];
+
   std::cout << std::unitbuf;
   std::cerr << std::unitbuf;
 
@@ -109,7 +132,7 @@ int main(int argc, char **argv)
 
   std::cout << "Waiting for a client to connect...\n";
 
-  
+
 
   while (true)
   {
