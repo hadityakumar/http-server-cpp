@@ -78,7 +78,7 @@ int main(int argc, char **argv)
   while(std::getline(stream, line) && line != "\r"){
     std::string key = line.substr(0, line.find(":"));
     std::cout << key << std::endl;
-    std::string value = line.substr(line.find(":")+2)
+    std::string value = line.substr(line.find(":")+2);
     map[key] = value;
     std::cout<< value << std::endl;
   }
