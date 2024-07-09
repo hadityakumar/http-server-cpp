@@ -52,7 +52,7 @@ void handleClient(int client, std::string dir)
 
   //Body parsing
 
-  std::string body = stream.str();
+  std::string body = stream.str().substr(stream.tellg());
 
 
 
