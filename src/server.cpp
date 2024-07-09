@@ -65,7 +65,8 @@ void handleClient(int client, std::string &dir)
     std::ifstream file(dir + fileName);
 
     if(file.good()){
-      std::stringstream buffer = file.rdbuf();
+      std::stringstream buffer;
+      buffer << file.rdbuf();
       std::string response = "HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: "+ buffer.str().size() + "\r\n\r\n" + buffer.str();
       send(client, response.c_str(), response.size(), 0);
     }
