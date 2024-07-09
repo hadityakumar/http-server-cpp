@@ -11,6 +11,7 @@
 #include <thread>
 #include <sstream>
 #include <fstream>
+#include <map>
 
 void handleClient(int client, std::string &dir)
 {
