@@ -65,26 +65,19 @@ int main(int argc, char **argv)
   recv(client, buffer, 1024, 0);
   std::string request(buffer);
 
+  std::istringstream stream(request);
+  std::string line;
 
+  std::getline(stream, line);
+  std::istringstream requestLine(line);
+  std::string method, path, httpVersion;
+  requestLine >> method >> path >> httpVersion;
 
-std::istringstream stream(request);
-std::string line;
+  size_t slashPos = path.find_last_of('/');
+  std::string fileName = path.substr(slashPos + 1);
 
-std::getline(stream, line);
-std::istringstream requestLine(line);
-std::string method, path, httpVersion;
-requestLine >> method >> path >> httpVersion;
-std::cout<<method<<std::endl<<path<<std::endl<<httpVersion<<std::endl;
+ send(client, "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: " + to_string(filename.size()) + "\r\n\r\n" + filename); 
 
-
-
-
-
-
-  if (request.substr(0, 10) == "GET / HTTP")
-    send(client, STATUS_OK.c_str(), STATUS_OK.size(), 0);
-  else
-    send(client, NOT_FOUND.c_str(), NOT_FOUND.size(), 0);
 
   close(server_fd);
   return 0;
