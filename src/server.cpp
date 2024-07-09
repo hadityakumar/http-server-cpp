@@ -65,7 +65,6 @@ int main(int argc, char **argv)
   std::string request(buffer);
 
 
-GET /echo/abc HTTP/1.1\r\nHost: localhost:4221\r\nUser-Agent: curl/7.64.1\r\nAccept: */*\r\n\r\n
 
 std::istringstream ss(request);
 std::string line;
@@ -74,7 +73,7 @@ std::getline(ss, line)
 std::istringstream requestLine(line);
 std::string method, path, httpVersion;
 requestLine >> method >> path >> httpVersion;
-cout<<method<<endl<<path<<endl<<httpVersion<<endl;
+std::cout<<method<<endl<<path<<endl<<httpVersion<<endl;
 
 
 
