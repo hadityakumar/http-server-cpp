@@ -9,6 +9,7 @@
 #include <netdb.h>
 #include <sstream>
 #include <bits/stdc++.h>
+
 int main(int argc, char **argv)
 {
   // Flush after every std::cout / std::cerr
@@ -75,14 +76,16 @@ int main(int argc, char **argv)
   requestLine >> method >> path >> httpVersion;
 
   std::map<std::string, std::string> map;
-  while(std::getline(stream, line) && line != "\r"){
+  while (std::getline(stream, line) && line != "\r")
+  {
     std::string key = line.substr(0, line.find(":"));
-    std::cout << key << std::endl;
-    std::string value = line.substr(line.find(":")+2);
+    std::string value = line.substr(line.find(":") + 2);
+    if (!value.empty() && value[0] == ' ')
+      value.erase(0, 1);
+    if (!value.empty() && value.back() == '\r')
+      value.pop_back();
     map[key] = value;
-    std::cout<< value << std::endl;
   }
-
 
   if (path == "/")
   {
@@ -95,12 +98,14 @@ int main(int argc, char **argv)
     std::string response = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: " + std::to_string(fileName.size()) + "\r\n\r\n" + fileName;
     send(client, response.c_str(), response.size(), 0);
   }
-  else if(path.size()>=11 && path.substr(0,11) == "/user-agent"){
+  else if (path.size() >= 11 && path.substr(0, 11) == "/user-agent")
+  {
     std::string response = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: " + std::to_string(map["User-Agent"].size()) + "\r\n\r\n" + map["User-Agent"];
     send(client, response.c_str(), response.size(), 0);
   }
 
-  else{
+  else
+  {
     send(client, NOT_FOUND.c_str(), NOT_FOUND.size(), 0);
   }
 
