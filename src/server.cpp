@@ -69,7 +69,7 @@ void handleClient(int client, std::string dir)
     send(client, response.c_str(), response.size(), 0);
   }
 
-  else if(path.size() >= 6 && path == "/files"){
+  else if(path.size() >= 6 && path.substr(0,7) == "/files/"){
     std::string fileName = path.substr(7);
     std::cout<<dir<<fileName<<"\n";
     std::ifstream file(dir + fileName);
