@@ -58,10 +58,9 @@ int main(int argc, char **argv) {
   std::string NOT_FOUND = "HTTP/1.1 404 Not Found\r\n\r\n";
 
   char buffer[1024];
-  ssize_t bytes_recvd = recv(client, buffer, 1024, 0);
+  int bytes_recvd = recv(client, buffer, 1024, 0);
   if(bytes_recvd < 0) {
     std::cerr << "recv failed\n";
-    close(client);
     close(server_fd);
     return 1;
   }
