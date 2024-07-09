@@ -57,8 +57,14 @@ int main(int argc, char **argv) {
   std::string STATUS_OK = "HTTP/1.1 200 OK\r\n\r\n";
   std::string NOT_FOUND = "HTTP/1.1 404 Not Found\r\n\r\n";
 
-  char buffer[1024];;
-  recv(client, buffer, 1024, 0);
+  char buffer[1024];
+  ssize_t bytes_recvd = recv(client, buffer, 1024, 0);
+  if(bytes_recvd < 0) {
+    std::cerr << "recv failed\n";
+    close(client);
+    close(server_fd);
+    return 1;
+  }
 
   std::string request(buffer);
   if(request.substr(0, 10) == "GET / HTTP")
