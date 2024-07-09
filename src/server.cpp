@@ -61,9 +61,26 @@ int main(int argc, char **argv)
   std::string NOT_FOUND = "HTTP/1.1 404 Not Found\r\n\r\n";
 
   char buffer[1024];
-  ;
   recv(client, buffer, 1024, 0);
   std::string request(buffer);
+
+
+GET /echo/abc HTTP/1.1\r\nHost: localhost:4221\r\nUser-Agent: curl/7.64.1\r\nAccept: */*\r\n\r\n
+
+std::istringstream ss(request);
+std::string line;
+
+std::getline(ss, line)
+std::istringstream requestLine(line);
+std::string method, path, httpVersion;
+requestLine >> method >> path >> httpVersion;
+cout<<method<<endl<<path<<endl<<httpVersion<<endl;
+
+
+
+
+
+
   if (request.substr(0, 10) == "GET / HTTP")
     send(client, STATUS_OK.c_str(), STATUS_OK.size(), 0);
   else
