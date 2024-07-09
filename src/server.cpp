@@ -15,6 +15,7 @@
 #include <fstream>
 #include <map>
 #include <set>
+#include <gzip/compress.hpp>
 
 void handleClient(int client, std::string dir)
 {
@@ -104,7 +105,8 @@ void handleClient(int client, std::string dir)
       }
       else
       {
-        std::string response = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Encoding: gzip\r\nContent-Length: " + std::to_string(fileName.size()) + "\r\n\r\n" + fileName;
+        std::string compressed = gzip::compress(fileName.c_str(), fileName.size());
+        std::string response = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Encoding: gzip\r\nContent-Length: " + std::to_string(compressed.size()) + "\r\n\r\n" + compressed;
         send(client, response.c_str(), response.size(), 0);
       }
     }
