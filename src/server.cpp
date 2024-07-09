@@ -74,6 +74,16 @@ int main(int argc, char **argv)
   std::string method, path, httpVersion;
   requestLine >> method >> path >> httpVersion;
 
+  std::map<std::string, std::string> map;
+  while(std::getline(stream, line) && line != "\r"){
+    std::string key = line.substr(0, line.find(":"));
+    std::cout << key << std::endl;
+    std::string value = line.substr(line.find(":")+2)
+    map[key] = value;
+    std::cout<< value << std::endl;
+  }
+
+
   if (path == "/")
   {
     send(client, STATUS_OK.c_str(), STATUS_OK.size(), 0);
@@ -85,6 +95,11 @@ int main(int argc, char **argv)
     std::string response = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: " + std::to_string(fileName.size()) + "\r\n\r\n" + fileName;
     send(client, response.c_str(), response.size(), 0);
   }
+  else if(path.size()>=11 && path.substr(0,11) == "/user-agent"){
+    std::string response = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: " + std::to_string(map["User-Agent"].size()) + "\r\n\r\n" + map["User-Agent"];
+    send(client, response.c_str(), response.size(), 0);
+  }
+
   else{
     send(client, NOT_FOUND.c_str(), NOT_FOUND.size(), 0);
   }
