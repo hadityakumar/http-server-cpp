@@ -14,6 +14,7 @@
 #include <thread>
 #include <fstream>
 #include <map>
+#include <set>
 
 void handleClient(int client, std::string dir)
 {
@@ -56,6 +57,15 @@ void handleClient(int client, std::string dir)
     map["Accept-Encoding"] = "";
   }
 
+  //Encoding
+  std::stringstream encodingStream(map["Accept-Encoding"]);
+  std::string encoding;
+  std::set<std::string> encoderSet;
+  while(std::getline(encodingStream, encoding, ',')){
+    encoderSet.insert(encoding);
+  }
+  
+
   // Body parsing
 
   std::getline(stream, line);
@@ -85,14 +95,14 @@ void handleClient(int client, std::string dir)
     {
       size_t slashPos = path.find_last_of('/');
       std::string fileName = path.substr(slashPos + 1);
-      if (map["Accept-Encoding"] == "invalid-encoding")
+      if (encoderSet.find("gzip") == encoderSet.end())
       {
         std::string response = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: " + std::to_string(fileName.size()) + "\r\n\r\n" + fileName;
         send(client, response.c_str(), response.size(), 0);
       }
       else
       {
-        std::string response = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Encoding: " + map["Accept-Encoding"] + "\r\nContent-Length: " + std::to_string(fileName.size()) + "\r\n\r\n" + fileName;
+        std::string response = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Encoding: gzip\r\nContent-Length: " + std::to_string(fileName.size()) + "\r\n\r\n" + fileName;
         send(client, response.c_str(), response.size(), 0);
       }
     }
