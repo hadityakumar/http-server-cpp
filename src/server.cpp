@@ -63,6 +63,7 @@ void handleClient(int client, std::string dir)
   std::set<std::string> encoderSet;
   while(std::getline(encodingStream, encoding, ',')){
     encoderSet.insert(encoding);
+    std::cout<<encoding<<std::endl;
   }
   
 
