@@ -60,12 +60,19 @@ int main(int argc, char **argv)
 
   std::string STATUS_OK = "HTTP/1.1 200 OK\r\n\r\n";
   std::string NOT_FOUND = "HTTP/1.1 404 Not Found\r\n\r\n";
-  char buffer[1024];;
 
-  recv(client, buffer, 1024, 0);
-  std::string request(buffer);
+  std::string clientMessage(1024, '\0');
 
-  if (request.substr(0, 10) == "GET / HTTP")
+  ssize_t brevcd = recv(client, (void *)&clientMessage[0], clientMessage.max_size(), 0);
+   if (brevcd < 0) {
+      std::cerr << "error receiving message\n";
+      close(client);
+      close(server_fd);
+  }
+  std::cerr << "Client Message (length: " << clientMessage.size() << ")" << std::endl;
+  std::cerr << "Client Message (length: " << clientMessage.size() << ")" << std::endl;
+
+  if (clientMessage.substr(0, 10) == "GET / HTTP")
     send(client, STATUS_OK.c_str(), STATUS_OK.size(), 0);
   else
     send(client, NOT_FOUND.c_str(), NOT_FOUND.size(), 0);
