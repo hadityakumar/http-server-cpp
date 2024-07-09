@@ -76,7 +76,7 @@ int main(int argc, char **argv)
 
   size_t slashPos = path.find_last_of('/');
   std::string fileName = path.substr(slashPos + 1);
-  std::string response = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: " + std::to_string(fileName.size()) + "\r\n\r\n" + fileName
+  std::string response = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: " + std::to_string(fileName.size()) + "\r\n\r\n" + fileName;
  send(client, response, response.size(), 0); 
 
   close(server_fd);
