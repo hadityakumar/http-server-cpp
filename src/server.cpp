@@ -145,7 +145,7 @@ int main(int argc, char **argv)
       continue;
     }
     std::cout << "Client connected\n";
-    std::thread(handleClient, client, dir).detach();
+    std::thread(handleClient, client, std::cref(dir)).detach();
   }
 
   close(server_fd);
