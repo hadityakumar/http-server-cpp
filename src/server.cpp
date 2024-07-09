@@ -12,7 +12,7 @@
 #include <sstream>
 #include <fstream>
 
-void handleClient(int client)
+void handleClient(int client, std::string &dir)
 {
   std::string STATUS_OK = "HTTP/1.1 200 OK\r\n\r\n";
   std::string NOT_FOUND = "HTTP/1.1 404 Not Found\r\n\r\n";
@@ -143,7 +143,7 @@ int main(int argc, char **argv)
       continue;
     }
     std::cout << "Client connected\n";
-    std::thread(handleClient, client).detach();
+    std::thread(handleClient, client, dir).detach();
   }
 
   close(server_fd);
