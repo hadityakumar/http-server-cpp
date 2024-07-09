@@ -51,9 +51,9 @@ void handleClient(int client, std::string dir)
     map[key] = value;
   }
 
-  if(map.find("Accept-Encoding")==map.end())
+  if (map.find("Accept-Encoding") == map.end())
   {
-    map["Accept-Encoding"]="";
+    map["Accept-Encoding"] = "";
   }
 
   // Body parsing
@@ -85,8 +85,16 @@ void handleClient(int client, std::string dir)
     {
       size_t slashPos = path.find_last_of('/');
       std::string fileName = path.substr(slashPos + 1);
-      std::string response = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Encoding: "+ map["Accept-Encoding"] + "\r\nContent-Length: " + std::to_string(fileName.size()) + "\r\n\r\n" + fileName;
-      send(client, response.c_str(), response.size(), 0);
+      if (map["Accept-Encoding"] == "invalid-encoding")
+      {
+        std::string response = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: " + std::to_string(fileName.size()) + "\r\n\r\n" + fileName;
+        send(client, response.c_str(), response.size(), 0);
+      }
+      else
+      {
+        std::string response = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Encoding: " + map["Accept-Encoding"] + "\r\nContent-Length: " + std::to_string(fileName.size()) + "\r\n\r\n" + fileName;
+        send(client, response.c_str(), response.size(), 0);
+      }
     }
     else if (path.size() >= 11 && path.substr(0, 11) == "/user-agent")
     {
