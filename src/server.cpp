@@ -74,10 +74,20 @@ int main(int argc, char **argv)
   std::string method, path, httpVersion;
   requestLine >> method >> path >> httpVersion;
 
-  size_t slashPos = path.find_last_of('/');
-  std::string fileName = path.substr(slashPos + 1);
-  std::string response = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: " + std::to_string(fileName.size()) + "\r\n\r\n" + fileName;
- send(client, response.c_str(), response.size(), 0); 
+  if (path == "/")
+  {
+    send(client, STATUS_OK.c_str(), STATUS_OK.size(), 0);
+  }
+  else if (path.size() >= 5 && path.substr(0, 5) == "/echo")
+  {
+    size_t slashPos = path.find_last_of('/');
+    std::string fileName = path.substr(slashPos + 1);
+    std::string response = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: " + std::to_string(fileName.size()) + "\r\n\r\n" + fileName;
+    send(client, response.c_str(), response.size(), 0);
+  }
+  else{
+    send(client, NOT_FOUND.c_str(), NOT_FOUND.size(), 0);
+  }
 
   close(server_fd);
   return 0;
