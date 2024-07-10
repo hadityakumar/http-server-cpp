@@ -17,6 +17,8 @@
 #include <set>
 #include <zlib.h>
 
+
+//gzip compression
 std::string compress_string(const std::string& str, int compressionlevel = Z_BEST_COMPRESSION) {
     z_stream_s zs;
     memset(&zs, 0, sizeof(zs));
@@ -169,6 +171,7 @@ void handleClient(int client, std::string dir)
   return;
 }
 
+//main function
 int main(int argc, char **argv)
 {
   std::string dir;
