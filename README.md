@@ -1,39 +1,125 @@
-[![progress-banner](https://backend.codecrafters.io/progress/http-server/427f66e8-e8dc-4676-9e33-95e9a210279c)](https://app.codecrafters.io/users/codecrafters-bot?r=2qF)
+# Simple HTTP Server
 
-This is a starting point for C++ solutions to the
-["Build Your Own HTTP server" Challenge](https://app.codecrafters.io/courses/http-server/overview).
+This is a simple HTTP server implemented in C++ that handles basic GET and POST requests. It supports gzip compression for responses and can serve files from a specified directory.
 
-[HTTP](https://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol) is the
-protocol that powers the web. In this challenge, you'll build a HTTP/1.1 server
-that is capable of serving multiple clients.
+## Features
 
-Along the way you'll learn about TCP servers,
-[HTTP request syntax](https://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html),
-and more.
+- **GET /echo/{text}**: Echoes the text back to the client, with optional gzip compression.
+- **GET /user-agent**: Returns the `User-Agent` header value from the client's request.
+- **GET /files/{filename}**: Serves the specified file from the server's directory.
+- **POST /files/{filename}**: Saves the request body as a file with the specified filename in the server's directory.
+- Supports gzip compression for responses if the client accepts it.
 
-**Note**: If you're viewing this repo on GitHub, head over to
-[codecrafters.io](https://codecrafters.io) to try the challenge.
+## Requirements
 
-# Passing the first stage
+- zlib library
+- C++11 or later
 
-The entry point for your HTTP server implementation is in `src/server.cpp`.
-Study and uncomment the relevant code, and push your changes to pass the first
-stage:
+## Building
+
+1. Ensure you have `zlib` installed on your system.
+2. Compile the server using a C++ compiler.
 
 ```sh
-git add .
-git commit -m "pass 1st stage" # any msg
-git push origin master
+g++ -std=c++11 -lz -o http_server http_server.cpp
 ```
 
-Time to move on to the next stage!
+## Usage
 
-# Stage 2 & beyond
+Run the server with the `--directory` option to specify the directory where files will be served from and saved.
 
-Note: This section is for stages 2 and beyond.
+```sh
+./http_server --directory /path/to/directory
+```
 
-1. Ensure you have `cmake` installed locally
-1. Run `./your_server.sh` to run your program, which is implemented in
-   `src/server.cpp`.
-1. Commit your changes and run `git push origin master` to submit your solution
-   to CodeCrafters. Test output will be streamed to your terminal.
+The server listens on port `4221` and logs will appear on the console.
+
+## Code Overview
+
+### Gzip Compression
+
+The function `compress_string` compresses a given string using gzip compression.
+
+```cpp
+std::string compress_string(const std::string& str, int compressionlevel = Z_BEST_COMPRESSION) {
+    z_stream_s zs;
+    memset(&zs, 0, sizeof(zs));
+    if (deflateInit2(&zs, compressionlevel, Z_DEFLATED, 31, 8, Z_DEFAULT_STRATEGY) != Z_OK)
+        throw(std::runtime_error("deflateInit failed while compressing."));
+    zs.next_in = (Bytef*)str.data();
+    zs.avail_in = str.size();
+    int ret;
+    char outbuffer[32768];
+    std::string outstring;
+    do {
+        zs.next_out = reinterpret_cast<Bytef*>(outbuffer);
+        zs.avail_out = sizeof(outbuffer);
+        ret = deflate(&zs, Z_FINISH);
+        if (outstring.size() < zs.total_out) {
+            outstring.append(outbuffer, zs.total_out - outstring.size());
+        }
+    } while (ret == Z_OK);
+    deflateEnd(&zs);
+    if (ret != Z_STREAM_END) {
+        throw(std::runtime_error("Exception during zlib compression: " + std::to_string(ret)));
+    }
+    return outstring;
+}
+```
+
+### Client Handling
+
+The function `handleClient` processes client requests.
+
+```cpp
+void handleClient(int client, std::string dir) {
+    // Handling client requests and sending appropriate responses
+}
+```
+
+### Main Function
+
+The main function initializes the server, binds to a port, and listens for incoming connections.
+
+```cpp
+int main(int argc, char **argv) {
+    // Server initialization and connection handling
+}
+```
+
+## Example Requests
+
+### GET /echo/{text}
+
+```
+GET /echo/hello HTTP/1.1
+Host: localhost:4221
+Accept-Encoding: gzip
+```
+
+### GET /user-agent
+
+```
+GET /user-agent HTTP/1.1
+Host: localhost:4221
+User-Agent: MyCustomClient/1.0
+```
+
+### GET /files/{filename}
+
+```
+GET /files/example.txt HTTP/1.1
+Host: localhost:4221
+```
+
+### POST /files/{filename}
+
+```
+POST /files/newfile.txt HTTP/1.1
+Host: localhost:4221
+Content-Length: 11
+
+Hello World
+```
+
+This simple HTTP server can be extended and modified to handle more complex use cases and protocols as needed.
