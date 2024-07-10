@@ -131,7 +131,7 @@ void handleClient(int client, std::string dir)
       }
       else
       {
-        std::string compressed = std::compress_string(fileName);
+        std::string compressed = compress_string(fileName);
         std::string response = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Encoding: gzip\r\nContent-Length: " + std::to_string(compressed.size()) + "\r\n\r\n" + compressed;
         send(client, response.c_str(), response.size(), 0);
       }
