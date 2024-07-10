@@ -15,8 +15,33 @@
 #include <fstream>
 #include <map>
 #include <set>
-#include <gzip/compress.hpp>
-#include <bits/stdc++.h>
+#include <zlib.h>
+
+std::string compress_string(const std::string& str, int compressionlevel = Z_BEST_COMPRESSION) {
+    z_stream_s zs;
+    memset(&zs, 0, sizeof(zs));
+    if (deflateInit2(&zs, compressionlevel, Z_DEFLATED, 31, 8, Z_DEFAULT_STRATEGY) != Z_OK)
+        throw(std::runtime_error("deflateInit failed while compressing."));
+    zs.next_in = (Bytef*)str.data();
+    zs.avail_in = str.size();
+    int ret;
+    char outbuffer[32768];
+    std::string outstring;
+    do {
+        zs.next_out = reinterpret_cast<Bytef*>(outbuffer);
+        zs.avail_out = sizeof(outbuffer);
+        ret = deflate(&zs, Z_FINISH);
+        if (outstring.size() < zs.total_out) {
+            outstring.append(outbuffer, zs.total_out - outstring.size());
+        }
+    } while (ret == Z_OK);
+    deflateEnd(&zs);
+    if (ret != Z_STREAM_END) {
+        throw(std::runtime_error("Exception during zlib compression: " + std::to_string(ret)));
+    }
+    return outstring;
+}
+
 
 void handleClient(int client, std::string dir)
 {
@@ -106,7 +131,7 @@ void handleClient(int client, std::string dir)
       }
       else
       {
-        std::string compressed = gzip::compress(fileName.c_str(), fileName.size());
+        std::string compressed = std::compress_string(fileName);
         std::string response = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Encoding: gzip\r\nContent-Length: " + std::to_string(compressed.size()) + "\r\n\r\n" + compressed;
         send(client, response.c_str(), response.size(), 0);
       }
